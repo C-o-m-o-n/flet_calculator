@@ -2,7 +2,7 @@
 
 A user-friendly calculator app built with Flet, offering basic and advanced features for seamless calculations on any desktop platform.
 
-Features:
+## Features:
 
 - Basic arithmetic operations: +, -, *, /
 - Parentheses for complex calculations
@@ -13,7 +13,7 @@ Features:
 - Customizable color scheme
 
 
-Tech Stack:
+## Tech Stack:
 
 - Python
 - Flet
@@ -21,17 +21,17 @@ Tech Stack:
 - re (Regular expressions for pattern matching)
 
 
-Installation and Usage:
+## Installation and Usage:
 
 1. Clone the repository.
 2. Install required dependencies: pip install flet numexpr
 3. Run the app: python main.py
 
 
-Contribution:
+## Contribution:
 
 Pull requests and issue reports are welcome! Please refer to the CONTRIBUTING.md file for guidelines.
 
-License:
+## License:
 
-MIT License
+Apache-2.0 License

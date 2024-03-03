@@ -19,13 +19,6 @@ class CalculatorApp(UserControl):
     # ------------------------------------------------------------------------------
     def __init__(self):
         super().__init__()
-        self.history_list = []
-        self.history = ft.Text(
-            value="",
-            size=20,
-            text_align="right",
-            color=COLORS["hint_text"],
-        )
         self.text = create_text()
         self.result = ft.Text(
             value="",
@@ -33,6 +26,13 @@ class CalculatorApp(UserControl):
             text_align="right",
             color=ft.colors.AMBER_300,
         )
+        self.history = ft.Text(
+            value="",
+            size=20,
+            text_align="right",
+            color=COLORS["hint_text"],
+        )
+        self.history_list = []
         self.rows = create_button_rows(self.handle_keyboard_input)
 
     def build(self):

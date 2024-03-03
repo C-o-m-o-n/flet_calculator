@@ -1,56 +1,59 @@
-from re import sub, findall
+from re import sub
 from numexpr import evaluate
 from numpy import round, array, ndarray
 from constants import ALLOWED_KEYS, NUMPAD_OPERATIONS, ALL_OPERATORS
 
 
-def prevent_first_operator(data: str, text: str) -> bool:
-    """Checks if input is an operator and if it's the first input in the text field"""
-    return text == "" and data in ("*", "/", "Numpad Multiply", "Numpad Divide")
+def prevent_initial_operator_input(input_key: str, current_expression: str) -> bool:
+    """Checks if the first input is empty and is either '*' or '/' in the current_expression object"""
+    return current_expression == "" and input_key in ("*", "/", "Numpad Multiply", "Numpad Divide")
+
+def prevent_last_operator_input(current_expression: str) -> str:
+    """Checks if the current_expression object has a value and the last input is an operator in the current_expression object"""
+    return current_expression and current_expression[-1] in ALL_OPERATORS
 
 
-def prevent_last_operator(text: str) -> str:
-    """Checks if input is an operator and if it's the last input in the text field"""
-    return text and text[-1] in ALL_OPERATORS
-
-
-def is_allowed_key(data: str) -> bool:
+def is_valid_input_key(input_key: str) -> bool:
     """Checks if the input key is allowed"""
-    return data in ALLOWED_KEYS
+    return input_key in ALLOWED_KEYS
 
 
-def is_numpad_input(data: str) -> bool:
+def is_input_from_numpad(input_key: str) -> bool:
     """Checks if the input is from the numpad"""
-    return isinstance(data, str) and data.startswith("Numpad")
+    return isinstance(input_key, str) and input_key.startswith("Numpad")
 
 
-def handle_numpad_input(data: str, text: str):
+def process_numpad_input(input_key: str, current_expression: str):
     """Handles numpad input"""
-    if data in NUMPAD_OPERATIONS:
-        return update_text(NUMPAD_OPERATIONS[data], text)
+    if input_key in NUMPAD_OPERATIONS:
+        return update_calculator_display(NUMPAD_OPERATIONS[input_key], current_expression)
     else:
-        return text + data[-1]
+        return current_expression + input_key[-1]
 
 
-def update_text(data: str, text: str) -> str:
-    """Updates the text field with input validation"""
-    if data == ")":
-        if text and text.count("(") > text.count(")"):
-            text += data
+def update_calculator_display(input_key: str, current_expression: str) -> str:
+    """Updates the current_expression with input validation"""
+    # Check if ")" is inputted first, and replace it with "("
+    if input_key == ")":
+        if current_expression and current_expression.count("(") > current_expression.count(")"):
+            current_expression += input_key
         else:
-            text += "("
+            current_expression += "("
     else:
-        text += data
+        current_expression += input_key
 
-    last_char = text[-1:] if text else ""
+
+    last_char = current_expression[-1:] if current_expression else ""
     if (
-        not data in text
-        and (last_char not in ALL_OPERATORS or data not in ALL_OPERATORS)
-        and not text.endswith("0")
+        not input_key in current_expression
+        and (last_char not in ALL_OPERATORS or input_key not in ALL_OPERATORS)
+        and not current_expression.endswith("0")
     ):
-        return text + data
+        return current_expression + input_key
     else:
-        return text
+        return current_expression
+    
+    
 
 
 def preprocess_expression(expression: str) -> str:
@@ -92,19 +95,17 @@ def preprocess_expression(expression: str) -> str:
     return processed_expression
 
 
-def is_calculate_input(data: str) -> bool:
-    """Checks if the input is '=' or 'Enter'"""
-    return data == "=" or (isinstance(data, str) and data == "Enter")
+def is_calculate_key_pressed(input_key: str) -> bool:
+    """Checks if the input is '=' or 'Enter'."""
+    return input_key == "=" or (isinstance(input_key, str) and input_key == "Enter")
 
 
-def calculate_result(text: str) -> str:
-    """Calculates the result of the expression in the text field and updates the text field"""
+def calculate_result(current_expression: str) -> str:
+    """Calculates the result of the expression in the current_expression object and updates it"""
     result = ""
-    expression = preprocess_expression(text)
+    expression = preprocess_expression(current_expression)
 
     try:
-        # Ensure there are 2 number and 1 operator before calculating
-        # if number_count >= 2 and operator_count >= 1:
         result = evaluate(expression)
         # Ensure result is a NumPy array for element-wise rounding
         if not isinstance(result, ndarray):
@@ -116,96 +117,97 @@ def calculate_result(text: str) -> str:
         pass
 
 
-def is_backspace_input(data: str) -> bool:
+def is_backspace_key_pressed(input_key: str) -> bool:
     """Checks if the input is 'e' or 'Backspace'"""
-    return data == "e" or (isinstance(data, str) and data == "Backspace")
+    return input_key == "e" or (isinstance(input_key, str) and input_key == "Backspace")
 
 
-def handle_backspace(text: str, result: str) -> tuple[str, str]:
+def handle_backspace(current_expression: str, result: str) -> tuple[str, str]:
     """Handles backspace input"""
-    text = text[:-1]
+    current_expression = current_expression[:-1]
     result = result[:-1]
-    return text, result
+    return current_expression, result
 
 
-def is_clear_input(data: str) -> bool:
+def is_clear_key_pressed(input_key: str) -> bool:
     """Checks if the input is 'c' for clear"""
-    return data == "c"
+    return input_key == "c"
 
 
-def handle_clear(
-    text: str, history: str, history_list: list, result: str
+def clear_calculator_state(
+    current_expression: str, history: str, history_list: list, result: str
 ) -> tuple[str, str, list]:
-    """Clears text field"""
-    if text:
-        # If text has a value, clear it regardless of history
-        cleared_text = ""
+    """Clears current_expression, history, and result"""
+    if current_expression:
+        # If current_expression has a value, clear it regardless of history
         cleared_history = history
         cleared_history_list = history_list
+        cleared_current_expression = ""
         cleared_result = ""
     else:
-        # If text is empty, check if history needs clearing
-        cleared_text = text  # Keep text empty
+        # If current_expression is empty, check if history needs clearing
+        cleared_current_expression = current_expression  # Keep current_expression empty
         cleared_result = result
         if history:
             # Clear history if it has a value
             cleared_history = ""
             cleared_history_list = []
         else:
-            # Nothing to clear if both text and history are empty
+            # Nothing to clear if both current_expression and history are empty
             cleared_history = history
             cleared_history_list = history_list
-    return cleared_text, cleared_history, cleared_history_list, cleared_result
+            
+    return cleared_current_expression, cleared_history, cleared_history_list, cleared_result
 
 
-def handle_keyboard_input(event, text, result, history, history_list):
-    data = event.control.data or event.key
+def handle_keyboard_input(event, current_expression, result, history, history_list):
+    input_key = event.control.data or event.key
 
-    # Prevent "*" and "/" from being inputted first into text object
-    if prevent_first_operator(data, text):
-        return text
+    # Prevent "*" and "/" from being inputted first into current_expression object
+    if prevent_initial_operator_input(input_key, current_expression):
+        return current_expression
 
-    # Append the [keyboard / pressed buttons input] to text object
-    if is_allowed_key(data):
-        text = update_text(data, text)
-        # print(text)
-        result = calculate_result(text)
+    # Append the [keyboard / pressed buttons input] to current_expression object
+    if is_valid_input_key(input_key):
+        current_expression = update_calculator_display(input_key, current_expression)
+        # print(current_expression)
+        result = calculate_result(current_expression)
 
     # Handle numpad input:
-    elif is_numpad_input(data):
-        text = handle_numpad_input(data, text)
-        result = calculate_result(text)
+    elif is_input_from_numpad(input_key):
+        current_expression = process_numpad_input(input_key, current_expression)
+        result = calculate_result(current_expression)
 
     # Handle "=" or "Enter" to calculate the result
-    elif is_calculate_input(data):
-        if text == "":
+    elif is_calculate_key_pressed(input_key):
+        if current_expression == "":
             return
-        elif prevent_last_operator(text):
-            text = text[:-1]
+        elif prevent_last_operator_input(current_expression):
+            current_expression = current_expression[:-1]
         else:
             # format the history value, example (1 + 1 = 2)
-            calculated_text = f"{text} = {calculate_result(text)}"
+            calculated_current_expression = f"{current_expression} = {calculate_result(current_expression)}"
 
-            history_list.append(calculated_text)
+            history_list.append(calculated_current_expression)
             history_list_len = len(history_list)
             # if length of history list if 5 or more, update its values.  Otherwise keep them the same
             if history_list_len >= 5:
-                history = "\n".join(
-                    history_list[history_list_len - 5 : history_list_len + 1]
-                )
+                history = "\n".join(history_list[history_list_len - 5 : history_list_len + 1])
             else:
                 history = "\n".join(history_list)
 
             # The current calculation (1 + 1) will be evaluated (2)
-            text = calculate_result(text)
-            result = calculate_result(text)
+            current_expression = calculate_result(current_expression)
+            result = calculate_result(current_expression)
 
     # Handle backspace:
-    elif is_backspace_input(data):
-        text, result = handle_backspace(text, result)
+    elif is_backspace_key_pressed(input_key):
+        current_expression, result = handle_backspace(current_expression, result)
 
     # Handle clear:
-    elif is_clear_input(data):
-        text, history, history_list, result = handle_clear(
-            text, history, history_list, result
+    elif is_clear_key_pressed(input_key):
+        current_expression, result, history, history_list = clear_calculator_state(
+            current_expression, result, history, history_list
         )
+        
+    return current_expression, result, history, history_list

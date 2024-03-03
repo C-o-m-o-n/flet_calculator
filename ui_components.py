@@ -13,25 +13,6 @@ from constants import (
     BUTTON_LAYOUT,
 )
 
-# def create_textfield():
-#     """
-#     Creates a text field with predefined styles
-#     """
-#     return TextField(
-#         read_only=True,
-#         # height=100,
-#         border_color=COLORS["listview_bg"],
-#         # border_radius=border_radius.all(10),
-#         # bgcolor=COLORS["listview_bg"],
-#         text_style=TextStyle(size=50, color=COLORS["text"]),
-#         hint_text="0",
-#         text_size=20,
-#         text_align=TextAlign.RIGHT,
-#         # multiline=True,
-#         # max_length=15,
-#         # max_lines=3,
-#         # expand=True,
-#     )
 
 
 def create_button(text, data, on_click):

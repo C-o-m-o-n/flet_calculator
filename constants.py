@@ -19,15 +19,6 @@ all_values_set.discard(".")
 ALL_OPERATORS = ["+", "-", "*", "/", "%"] + list(all_values_set)
 
 
-# COLORS = {
-#     "background": "#333333",  # Charcoal gray background for readability
-#     "textfield_bg": "#444444",  # Slightly darker text field for visual clarity
-#     "text": "#FFFFFF",  # White text for optimal contrast
-#     "button_bg": "#009688",  # Teal primary color for a vibrant accent
-#     "button_bg_selected": "#00BCD4",  # Lighter teal for hover/pressed state
-#     "operator_bg": "#2196F3",  # Blue for operators, distinct but complementary
-#     "operator_text": "#FFFFFF",  # White text for operators
-# }
 
 COLORS = {
     "background": "#191F26",  # Matches dark background (adjust slightly for more contrast)

@@ -11,14 +11,15 @@ from flet import (
 from constants import COLORS
 from handle_keyboard_helpers import handle_keyboard_input
 from ui_components import create_button_rows, create_text
-
+# ------------------------------------------------------------------------------
 
 class CalculatorApp(UserControl):
     # ------------------------------------------------------------------------------
     # Initializing the layout components
     # ------------------------------------------------------------------------------
-    def __init__(self):
+    def __init__(self, page: Page):
         super().__init__()
+        self.page = page
         self.text = create_text()
         self.result = ft.Text(
             value="",
@@ -39,30 +40,30 @@ class CalculatorApp(UserControl):
         calculator_container = ft.Container(
             content=ft.Column(
                 controls=[
+                    # ft.Stack(controls=[
+                    #     ft.PopupMenuButton
+                    #     ]
+                    # ),
                     Container(
                         content=ft.Column(
                             controls=[
                                 Row(
                                     controls=[self.history],
                                     alignment=MainAxisAlignment.END,
-                                    wrap=True,
                                 ),
                                 Row(
                                     controls=[self.text],
                                     alignment=MainAxisAlignment.END,
-                                    wrap=True,
                                 ),
                                 Row(
                                     controls=[self.result],
                                     alignment=MainAxisAlignment.END,
-                                    wrap=True,
                                 ),
                             ],
-                            scroll=True,
-                            wrap=True,
+                            scroll="adaptive",
                             alignment=ft.alignment.bottom_right,
                         ),
-                        height=200,
+                        height=240,
                         bgcolor=COLORS["listview_bg"],
                         border=ft.border.all(3, COLORS["border"]),
                         border_radius=ft.border_radius.all(20),
@@ -79,12 +80,16 @@ class CalculatorApp(UserControl):
                                 Row(controls=[self.rows[4]]),
                             ],
                         ),
+                        # expand=True,
                     ),
                 ],
             ),
+            # width=self.page.window_width,
+            # height=self.page.window_height,
             bgcolor=COLORS["background"],
             border_radius=ft.border_radius.all(20),
             padding=5,
+            alignment=ft.alignment.center,
         )
 
         return calculator_container
@@ -94,6 +99,7 @@ class CalculatorApp(UserControl):
     # ------------------------------------------------------------------------------
 
     def handle_keyboard_input(self, event: KeyboardEvent):
+        
         text = self.text.value
         result = self.result.value
         history = self.history.value
@@ -129,10 +135,10 @@ def main(page: Page):
     page.vertical_alignment = MainAxisAlignment.CENTER
     page.horizontal_alignment = MainAxisAlignment.CENTER
 
-    calc_widget = CalculatorApp()
+    calc_widget = CalculatorApp(page)
     # Set the keyboard event handler for the page, to enable keyboard input
     page.on_keyboard_event = calc_widget.handle_keyboard_input
     page.add(calc_widget)
 
-
-app(target=main, assets_dir="assets")
+if __name__ == "__main__":
+    app(target=main, assets_dir="assets")

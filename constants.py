@@ -1,6 +1,3 @@
-import flet as ft
-
-
 # Allowed key for input
 ALLOWED_KEYS = set("1234567890+-*/().%")
 
@@ -17,6 +14,15 @@ NUMPAD_OPERATIONS = {
 all_values_set = set(NUMPAD_OPERATIONS.values())
 all_values_set.discard(".")
 ALL_OPERATORS = ["+", "-", "*", "/", "%"] + list(all_values_set)
+
+# Dictionary for mapping Shift + key combinations
+SHIFT_KEY_MAPPINGS = {
+    "5": "%",
+    "8": "*",
+    "9": "(",
+    "0": ")",
+    "=": "+",
+}
 
 
 
@@ -67,7 +73,7 @@ BUTTON_LAYOUT = [
         ["+", "+"],
     ],
     [
-        ["C", "c"],
+        ["C", "C"],
         ["0", "0"],
         [".", "."],
         ["=", "="],
